@@ -158,7 +158,9 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
 
         tabs.add(textArea, tabTitle);
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
-        tabs.getSelectedComponent().addKeyListener(this);
+
+        Component currentComponent = tabs.getSelectedComponent();
+        currentComponent.addKeyListener(this);
     }
 
     private void createFileTab(String path) {
@@ -204,8 +206,22 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
             case KeyEvent.VK_S -> saveCurrentFile();
             case KeyEvent.VK_O -> loadNewFile();
             case KeyEvent.VK_W -> closeCurrentFile();
+            case KeyEvent.VK_T -> createBlankTab();
+            case KeyEvent.VK_SPACE -> cycleTabs(e.isShiftDown());
             default -> { return; }
         }
+    }
+
+    private void cycleTabs(boolean reverse) {
+        int selectedIndex = tabs.getSelectedIndex();
+        int maxIndex = tabs.getTabCount() - 1;
+
+        selectedIndex = reverse ? selectedIndex - 1 : selectedIndex + 1;
+
+        selectedIndex = selectedIndex > maxIndex ? 0 : selectedIndex;
+        selectedIndex = selectedIndex < 0 ? maxIndex : selectedIndex;
+
+        tabs.setSelectedIndex(selectedIndex);
     }
 
     @Override
