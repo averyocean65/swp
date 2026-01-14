@@ -98,10 +98,19 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
     }
 
     private void closeCurrentFile() {
-        closeCurrentFile(false);
+        closeCurrentFile(false, false);
     }
 
-    private void closeCurrentFile(boolean forceKeepOpen) {
+    private void closeCurrentFile(boolean forceKeepOpen, boolean noSavePrompt) {
+        if(!noSavePrompt) {
+            int saveProject = JOptionPane.showConfirmDialog(rootFrame, "Would you like to save your file?", "Warning", JOptionPane.YES_NO_OPTION);
+            if (saveProject == JOptionPane.YES_OPTION) {
+                saveCurrentFile();
+            } else if(saveProject == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
+
         int currentIndex = tabs.getSelectedIndex();
         tabs.remove(tabs.getSelectedIndex());
 
@@ -143,7 +152,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
 
         if(reloadTab) {
-            closeCurrentFile(true);
+            closeCurrentFile(true, true);
             createFileTab(filePath);
         }
     }
@@ -169,6 +178,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
 
         JTextArea textArea = new JTextArea(tabContent);
+        textArea.setLineWrap(true);
 
         tabs.add(textArea, tabTitle);
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
