@@ -3,7 +3,7 @@ package org.averyocean65.swp;
 import java.io.*;
 import java.util.Scanner;
 
-class IO {
+public class IO {
     @SuppressWarnings("CallToPrintStackTrace")
     public static Result<String> readFile(String path) {
         File file = new File(path);

@@ -1,7 +1,6 @@
-package org.averyocean65.swp;
+package org.averyocean65.swp.windows;
 
 import javax.swing.*;
-import java.awt.*;
 
 public abstract class WindowWrapper {
     protected JFrame rootFrame;

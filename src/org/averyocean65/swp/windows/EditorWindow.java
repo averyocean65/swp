@@ -1,13 +1,12 @@
-package org.averyocean65.swp;
+package org.averyocean65.swp.windows;
 
-import jdk.jfr.StackTrace;
+import org.averyocean65.swp.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.lang.Runnable;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 public final class EditorWindow extends WindowWrapper implements ActionListener, KeyListener {

@@ -1,7 +1,6 @@
 package org.averyocean65.swp;
 
-import javax.swing.*;
-import java.awt.*;
+import org.averyocean65.swp.windows.EditorWindow;
 
 public final class Program {
     public static void main(String[] args) {
