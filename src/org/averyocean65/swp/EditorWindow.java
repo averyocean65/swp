@@ -122,7 +122,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
 
         boolean writeSuccess = IO.writeFile(filePath, fileContent);
         if (!writeSuccess) {
-            JOptionPane errorPane = new JOptionPane("Please select a file.", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(rootFrame, "Please select a file.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

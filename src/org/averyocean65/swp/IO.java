@@ -38,6 +38,7 @@ class IO {
     }
 
     public static boolean doesFileExist(String path) {
+        if(path == null) return false;
         return new File(path).exists();
     }
 
