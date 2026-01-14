@@ -1,12 +1,12 @@
 package org.averyocean65.swp.windows;
 
-import org.averyocean65.swp.*;
+import org.averyocean65.swp.IO;
+import org.averyocean65.swp.Result;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.lang.Runnable;
 import java.util.Hashtable;
 
 public final class EditorWindow extends WindowWrapper implements ActionListener, KeyListener {
