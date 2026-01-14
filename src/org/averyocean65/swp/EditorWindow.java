@@ -167,9 +167,6 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
             return;
         }
 
-        String tabTitle = path;
-        String tabContent = "";
-
         Result<File> file = IO.findFile(path);
         createFileTab(file.value);
     }
