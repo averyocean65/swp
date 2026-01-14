@@ -1,5 +1,7 @@
 package org.averyocean65.swp;
 
+import jdk.jfr.StackTrace;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -74,14 +76,18 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
     private void loadNewFile() {
         FileDialog dialog = new FileDialog(rootFrame, "Choose a file", FileDialog.LOAD);
         dialog.setFile("*");
+        dialog.setMultipleMode(true);
         dialog.setVisible(true);
 
-        String file = dialog.getFile();
-        if(file == null) {
-            return;
-        }
+        File[] files = dialog.getFiles();
+        for(int i = 0; i < files.length; i++) {
+            File openingFile = files[i];
+            if(!IO.doesFileExist(openingFile)) {
+                continue;
+            }
 
-        createFileTab(file);
+            createFileTab(openingFile);
+        }
     }
 
     private void closeCurrentFile() {
@@ -132,17 +138,15 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
         }
     }
 
-    private void createFileTab(String path) {
-        String tabTitle = path;
+    private void createFileTab(File file) {
+        String tabTitle = "";
         String tabContent = "";
 
-        Result<File> file = IO.findFile(path);
-
-        if(path.isBlank() || !file.success) {
+        if (file == null || !file.exists()) {
             tabTitle = "New";
         } else {
-            tabTitle = file.value.getAbsolutePath();
-            Result<String> read = IO.readFile(file.value);
+            tabTitle = file.getAbsolutePath();
+            Result<String> read = IO.readFile(file);
 
             if(read.success) {
                 tabContent = read.value;
@@ -152,6 +156,19 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
         JTextArea textArea = new JTextArea(tabContent);
         tabs.add(textArea, tabTitle);
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
+    }
+
+    private void createFileTab(String path) {
+        if(path == null) {
+            System.err.println("createFileTab() path == null!");
+            return;
+        }
+
+        String tabTitle = path;
+        String tabContent = "";
+
+        Result<File> file = IO.findFile(path);
+        createFileTab(file.value);
     }
 
     @Override

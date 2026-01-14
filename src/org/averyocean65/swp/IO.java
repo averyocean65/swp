@@ -39,7 +39,11 @@ class IO {
 
     public static boolean doesFileExist(String path) {
         if(path == null) return false;
-        return new File(path).exists();
+        return doesFileExist(new File(path));
+    }
+
+    public static boolean doesFileExist(File file) {
+        return file.exists();
     }
 
     public static boolean writeFile(String path, String content) {
