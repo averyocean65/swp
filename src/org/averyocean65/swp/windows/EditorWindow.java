@@ -19,6 +19,8 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
     private JMenuItem saveFile;
     private JMenuItem closeFile;
 
+    private JMenuItem aboutSwp;
+
     public EditorWindow(String title, int width, int height) {
         super(title, width, height);
         menuActionMap = new Hashtable<>();
@@ -53,6 +55,14 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         fileCategory.add(saveFile);
         fileCategory.add(closeFile);
         menuBar.add(fileCategory);
+
+        // HELP
+        JMenu helpCategory = new JMenu("Help");
+
+        aboutSwp = createMenuItem("About", this::aboutSwp);
+
+        helpCategory.add(aboutSwp);
+        menuBar.add(helpCategory);
 
         // FINAL
         rootFrame.setJMenuBar(menuBar);
@@ -136,6 +146,11 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
             closeCurrentFile(true);
             createFileTab(filePath);
         }
+    }
+
+    private void aboutSwp() {
+        InfoWindow window = new InfoWindow("About SWP", 300, 150);
+        window.setShowing(true);
     }
 
     private void createFileTab(File file) {
