@@ -4,15 +4,13 @@ import jdk.jfr.StackTrace;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.lang.Runnable;
 import java.util.HashMap;
 import java.util.Hashtable;
 
-public final class EditorWindow extends WindowWrapper implements ActionListener {
+public final class EditorWindow extends WindowWrapper implements ActionListener, KeyListener {
     private JTabbedPane tabs;
 
     private Hashtable<String, Runnable> menuActionMap = new Hashtable<>();
@@ -95,6 +93,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
     }
 
     private void closeCurrentFile(boolean forceKeepOpen) {
+        int currentIndex = tabs.getSelectedIndex();
         tabs.remove(tabs.getSelectedIndex());
 
         boolean shouldCloseWindow = tabs.getTabCount() < 1;
@@ -105,7 +104,8 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
 
         // special case for when forceKeepOpen = true
         if(!shouldCloseWindow) {
-            tabs.setSelectedIndex(0);
+            currentIndex = Math.max(0, Math.min(tabs.getTabCount() - 1, currentIndex));
+            tabs.setSelectedIndex(currentIndex);
         }
     }
 
@@ -154,8 +154,10 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
         }
 
         JTextArea textArea = new JTextArea(tabContent);
+
         tabs.add(textArea, tabTitle);
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
+        tabs.getSelectedComponent().addKeyListener(this);
     }
 
     private void createFileTab(String path) {
@@ -187,5 +189,29 @@ public final class EditorWindow extends WindowWrapper implements ActionListener 
             System.out.println("An exception occurred.");
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(!e.isControlDown()) {
+            return;
+        }
+
+        switch(e.getKeyCode()) {
+            case KeyEvent.VK_S -> saveCurrentFile();
+            case KeyEvent.VK_O -> loadNewFile();
+            case KeyEvent.VK_W -> closeCurrentFile();
+            default -> { return; }
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }
