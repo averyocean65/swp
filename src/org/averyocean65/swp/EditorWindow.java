@@ -104,6 +104,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
 
         // special case for when forceKeepOpen = true
         if(!shouldCloseWindow) {
+            // essentially a clamp operation
             currentIndex = Math.max(0, Math.min(tabs.getTabCount() - 1, currentIndex));
             tabs.setSelectedIndex(currentIndex);
         }
