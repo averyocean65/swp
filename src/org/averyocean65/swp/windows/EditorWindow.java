@@ -227,12 +227,12 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
 
         switch(e.getKeyCode()) {
-            case KeyEvent.VK_S -> saveCurrentFile();
-            case KeyEvent.VK_O -> loadNewFile();
-            case KeyEvent.VK_W -> closeCurrentFile();
-            case KeyEvent.VK_T -> createBlankTab();
-            case KeyEvent.VK_SPACE -> cycleTabs(e.isShiftDown());
-            default -> { return; }
+            case KeyEvent.VK_S: saveCurrentFile(); break;
+            case KeyEvent.VK_O: loadNewFile(); break;
+            case KeyEvent.VK_W: closeCurrentFile(); break;
+            case KeyEvent.VK_T: createBlankTab(); break;
+            case KeyEvent.VK_SPACE: cycleTabs(e.isShiftDown()); break;
+            default: return;
         }
     }
 
