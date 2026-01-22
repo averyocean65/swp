@@ -93,6 +93,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         for(int i = 0; i < files.length; i++) {
             File openingFile = files[i];
             if(!IO.doesFileExist(openingFile)) {
+                JOptionPane.showMessageDialog(rootFrame, "Selected file (" + openingFile + ") doesn't exist!", "Error", JOptionPane.ERROR_MESSAGE);
                 continue;
             }
 

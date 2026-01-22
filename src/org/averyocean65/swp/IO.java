@@ -25,7 +25,7 @@ public class IO {
             return new Result<>(false, "");
         }
 
-        return new Result<>(true, output.toString());
+        return new Result<>(true, output.substring(0, output.length() - 1));
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
@@ -49,6 +49,8 @@ public class IO {
     public static boolean writeFile(String path, String content) {
         try {
             File fileToWrite = new File(path);
+
+            // This should ensure the file exists
             fileToWrite.createNewFile();
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(path));
