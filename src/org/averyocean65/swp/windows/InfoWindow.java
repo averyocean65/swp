@@ -19,7 +19,7 @@ public class InfoWindow extends WindowWrapper {
                 .deriveFont(16.0f);
         header.setFont(headerFont);
 
-        JLabel versionInfo = new JLabel("Version 1.0.0");
+        JLabel versionInfo = new JLabel("Version 1.0.1");
         JLabel openSourceInfo = new JLabel("GitHub: https://github.com/averyocean65/SWP");
 
         rootFrame.add(header, BorderLayout.CENTER);

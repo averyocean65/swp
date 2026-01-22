@@ -17,6 +17,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
     private JMenuItem newFile;
     private JMenuItem openFile;
     private JMenuItem saveFile;
+    private JMenuItem saveAsFile;
     private JMenuItem closeFile;
 
     private JMenuItem aboutSwp;
@@ -45,14 +46,16 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         // FILES
         JMenu fileCategory = new JMenu("File");
 
-        newFile = createMenuItem("New File", this::createBlankTab);
-        openFile = createMenuItem("Open File", this::loadNewFile);
-        saveFile = createMenuItem("Save File", this::saveCurrentFile);
-        closeFile = createMenuItem("Close File", this::closeCurrentFile);
+        newFile = createMenuItem("New", this::createBlankFileProcedure);
+        openFile = createMenuItem("Open", this::loadFileProcedure);
+        saveFile = createMenuItem("Save", this::saveFileProcedure);
+        saveAsFile = createMenuItem("Save As", this::saveAsProcedure);
+        closeFile = createMenuItem("Close File", this::closeCurrentFileProcedure);
 
         fileCategory.add(newFile);
         fileCategory.add(openFile);
         fileCategory.add(saveFile);
+        fileCategory.add(saveAsFile);
         fileCategory.add(closeFile);
         menuBar.add(fileCategory);
 
@@ -73,14 +76,14 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         tabs = new JTabbedPane();
         rootFrame.add(tabs);
 
-        createBlankTab();
+        createBlankFileProcedure();
     }
 
-    private void createBlankTab() {
+    private void createBlankFileProcedure() {
         createFileTab("");
     }
 
-    private void loadNewFile() {
+    private void loadFileProcedure() {
         FileDialog dialog = new FileDialog(rootFrame, "Choose a file", FileDialog.LOAD);
         dialog.setFile("*");
         dialog.setMultipleMode(true);
@@ -97,15 +100,15 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
     }
 
-    private void closeCurrentFile() {
-        closeCurrentFile(false, false);
+    private void closeCurrentFileProcedure() {
+        closeCurrentFileProcedure(false, false);
     }
 
-    private void closeCurrentFile(boolean forceKeepOpen, boolean noSavePrompt) {
+    private void closeCurrentFileProcedure(boolean forceKeepOpen, boolean noSavePrompt) {
         if(!noSavePrompt) {
             int saveProject = JOptionPane.showConfirmDialog(rootFrame, "Would you like to save your file?", "Warning", JOptionPane.YES_NO_OPTION);
             if (saveProject == JOptionPane.YES_OPTION) {
-                saveCurrentFile();
+                saveFileProcedure();
             } else if(saveProject == JOptionPane.CANCEL_OPTION) {
                 return;
             }
@@ -128,7 +131,15 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
     }
 
-    private void saveCurrentFile() {
+    private void saveFileProcedure() {
+        saveFile(false);
+    }
+
+    private void saveAsProcedure() {
+        saveFile(true);
+    }
+
+    private void saveFile(boolean saveAs) {
         int tabIndex = tabs.getSelectedIndex();
         String filePath = tabs.getTitleAt(tabIndex);
 
@@ -136,23 +147,24 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         JTextArea area = (JTextArea) tabs.getSelectedComponent();
         String fileContent = area.getText();
 
-        boolean reloadTab = filePath == null || filePath.isBlank() || filePath.equals("New");
+        boolean reloadTab = saveAs || filePath == null || filePath.isBlank() || filePath.equals("New");
         if(reloadTab) {
             FileDialog dialog = new FileDialog(rootFrame, "", FileDialog.SAVE);
             dialog.setFile("*");
             dialog.setVisible(true);
 
-            filePath = dialog.getFile();
+            filePath = dialog.getDirectory() + "/" + dialog.getFile();
+            System.out.println("File path: " + filePath);
         }
 
         boolean writeSuccess = IO.writeFile(filePath, fileContent);
         if (!writeSuccess) {
-            JOptionPane.showMessageDialog(rootFrame, "Please select a file.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(rootFrame, "Please select a destination to save your file.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if(reloadTab) {
-            closeCurrentFile(true, true);
+            if(!saveAs) closeCurrentFileProcedure(true, true);
             createFileTab(filePath);
         }
     }
@@ -227,10 +239,10 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
 
         switch(e.getKeyCode()) {
-            case KeyEvent.VK_S: saveCurrentFile(); break;
-            case KeyEvent.VK_O: loadNewFile(); break;
-            case KeyEvent.VK_W: closeCurrentFile(); break;
-            case KeyEvent.VK_T: createBlankTab(); break;
+            case KeyEvent.VK_S: saveFile(e.isShiftDown()); break;
+            case KeyEvent.VK_O: loadFileProcedure(); break;
+            case KeyEvent.VK_W: closeCurrentFileProcedure(); break;
+            case KeyEvent.VK_T: createBlankFileProcedure(); break;
             case KeyEvent.VK_SPACE: cycleTabs(e.isShiftDown()); break;
             default: return;
         }

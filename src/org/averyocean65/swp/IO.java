@@ -47,11 +47,10 @@ public class IO {
     }
 
     public static boolean writeFile(String path, String content) {
-        if(!doesFileExist(path)) {
-            return false;
-        }
-
         try {
+            File fileToWrite = new File(path);
+            fileToWrite.createNewFile();
+
             BufferedWriter writer = new BufferedWriter(new FileWriter(path));
             writer.write(content);
 
