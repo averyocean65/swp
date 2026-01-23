@@ -4,13 +4,18 @@ import org.averyocean65.swp.IO;
 import org.averyocean65.swp.Result;
 
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Hashtable;
 
-public final class EditorWindow extends WindowWrapper implements ActionListener, KeyListener {
+public final class EditorWindow extends WindowWrapper implements ActionListener, KeyListener, UndoableEditListener {
     private JTabbedPane tabs;
+    private UndoManager undoManager;
 
     private Hashtable<String, Runnable> menuActionMap = new Hashtable<>();
 
@@ -20,17 +25,26 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
     private JMenuItem saveAsFile;
     private JMenuItem closeFile;
 
+    private JMenuItem undoAction;
+    private JMenuItem redoAction;
+
     private JMenuItem aboutSwp;
 
     public EditorWindow(String title, int width, int height) {
         super(title, width, height);
+        undoManager = new UndoManager();
         menuActionMap = new Hashtable<>();
         createMenu();
         rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private JMenuItem createMenuItem(String text, Runnable callback) {
+    private JMenuItem createMenuItem(String text, String keybindTooltip, Runnable callback) {
         JMenuItem item = new JMenuItem(text);
+
+        if(!keybindTooltip.isEmpty()) {
+            item.setToolTipText("Keybind: " + keybindTooltip);
+        }
+
         item.addActionListener(this);
 
         if(callback != null && menuActionMap != null) {
@@ -46,11 +60,11 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         // FILES
         JMenu fileCategory = new JMenu("File");
 
-        newFile = createMenuItem("New", this::createBlankFileProcedure);
-        openFile = createMenuItem("Open", this::loadFileProcedure);
-        saveFile = createMenuItem("Save", this::saveFileProcedure);
-        saveAsFile = createMenuItem("Save As", this::saveAsProcedure);
-        closeFile = createMenuItem("Close File", this::closeCurrentFileProcedure);
+        newFile = createMenuItem("New", "Ctrl + T", this::createBlankFileProcedure);
+        openFile = createMenuItem("Open", "Ctrl + O", this::loadFileProcedure);
+        saveFile = createMenuItem("Save", "Ctrl + S", this::saveFileProcedure);
+        saveAsFile = createMenuItem("Save As", "Ctrl + Shift + S", this::saveAsProcedure);
+        closeFile = createMenuItem("Close File", "Ctrl + W", this::closeCurrentFileProcedure);
 
         fileCategory.add(newFile);
         fileCategory.add(openFile);
@@ -59,10 +73,20 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         fileCategory.add(closeFile);
         menuBar.add(fileCategory);
 
+        // EDIT
+        JMenu editCategory = new JMenu("Edit");
+
+        undoAction = createMenuItem("Undo", "Ctrl + Z", this::undoProcedure);
+        redoAction = createMenuItem("Redo", "Ctrl + Shift + Z", this::redoProcedure);
+
+        editCategory.add(undoAction);
+        editCategory.add(redoAction);
+        menuBar.add(editCategory);
+
         // HELP
         JMenu helpCategory = new JMenu("Help");
 
-        aboutSwp = createMenuItem("About", this::aboutSwp);
+        aboutSwp = createMenuItem("About", "", this::aboutSwp);
 
         helpCategory.add(aboutSwp);
         menuBar.add(helpCategory);
@@ -170,6 +194,18 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
     }
 
+    private void undoProcedure() {
+        if(undoManager.canUndo()) {
+            undoManager.undo();
+        }
+    }
+
+    private void redoProcedure() {
+        if(undoManager.canRedo()) {
+            undoManager.redo();
+        }
+    }
+
     private void aboutSwp() {
         InfoWindow window = new InfoWindow("About SWP", 300, 150);
         window.setShowing(true);
@@ -191,6 +227,8 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         }
 
         JTextArea textArea = new JTextArea(tabContent);
+        textArea.getDocument().addUndoableEditListener(this);
+
         textArea.setLineWrap(true);
 
         tabs.add(textArea, tabTitle);
@@ -245,6 +283,15 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
             case KeyEvent.VK_W: closeCurrentFileProcedure(); break;
             case KeyEvent.VK_T: createBlankFileProcedure(); break;
             case KeyEvent.VK_SPACE: cycleTabs(e.isShiftDown()); break;
+            case KeyEvent.VK_Z: {
+                if(e.isShiftDown()) {
+                    redoProcedure();
+                    break;
+                }
+
+                undoProcedure();
+                break;
+            }
             default: return;
         }
     }
@@ -264,5 +311,10 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    @Override
+    public void undoableEditHappened(UndoableEditEvent e) {
+        undoManager.addEdit(e.getEdit());
     }
 }
