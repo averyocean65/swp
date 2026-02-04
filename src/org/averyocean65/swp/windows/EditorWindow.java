@@ -174,7 +174,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
 
         boolean reloadTab = saveAs || filePath == null || filePath.isBlank() || filePath.equals("New");
         if(reloadTab) {
-            FileDialog dialog = new FileDialog(rootFrame, "", FileDialog.SAVE);
+            FileDialog dialog = new FileDialog(rootFrame, "Save your file!", FileDialog.SAVE);
             dialog.setFile("*");
             dialog.setVisible(true);
 
@@ -215,7 +215,7 @@ public final class EditorWindow extends WindowWrapper implements ActionListener,
         String tabTitle = "";
         String tabContent = "";
 
-        if (file == null || !file.exists()) {
+        if (file == null || !file.exists() || file.isDirectory()) {
             tabTitle = "New";
         } else {
             tabTitle = file.getAbsolutePath();
